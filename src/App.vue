@@ -34,13 +34,19 @@ export default {
   },
   data() {
     return {
+
+      // Expression given by player
       expression: '',
     }
   },
   methods: {
+
+    // Run launch function in grid component, passing in expression
     launch() {
       this.$refs.graph.launch(this.expression);
     },
+
+    // Run update start function in grid component, passing in expression
     updateStart() {
       this.$refs.graph.updateStart(this.expression);
     }

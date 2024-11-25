@@ -1,9 +1,13 @@
 <template>
 
+  <!-- Load levels -->
   <Levels ref="levels" />
+
+  <!-- Data shown on top of grid -->
   <p style="margin-bottom: 0;">Fuel: <span style="opacity: 0.6">{{ Math.max(parseInt(fuel), 0) }}</span></p>
   <p :class="{win : win}" style="margin-top: 2px; font-size: 16px;">{{ coins }} / {{ coinCount }} <span @click="nextLevel()" v-if="win" class="next" style="margin-left: 15px; color: white;">Next Level</span></p>
 
+  <!-- Error message -->
   <div class="error" ref="error" v-if="showError">
     <div class="error-box">
       <h2 style="margin: auto; margin-top: 18px; width: 80%; height: fit-content; border-bottom: 1px white solid;">Error</h2>
@@ -21,13 +25,14 @@
     </div>
   </div>
 
+  <!-- Anything inside of the graph -->
   <div class="graph">
 
 
     <!-- Player -->
     <Player ref="player" :gridSize="this.gridSize" :fuel="fuel" @leave="leave" @updatePos="checkPlayerPos" />
 
-    <!-- Display level -->
+    <!-- Display coins -->
     <div v-for="(coin, index) in level" :key="coin" :ref="'coin-' + index">
       <Coin :gridSize="this.gridSize" :x="coin[0]" :y="coin[1]" :taken="coin[2]" :deadly="coin[3]" />
     </div>
@@ -86,13 +91,20 @@ export default {
   },
   methods: {
 
+    /**
+     * Run this method when the player exits the bounds of the level
+     */
     leave() {
+
+      // Check if the player collected all the coins, if so, win
       if(this.coins == this.coinCount) {
         this.win = true;
       }
     },
 
-    // Load next level
+    /**
+     * Load next level
+     */
     nextLevel() {
       this.levelNum++;
       this.loadLevel();
@@ -100,10 +112,16 @@ export default {
       this.resetLevel();
     },
 
+    /**
+     * Load the current level
+     */
     loadLevel() {
+
+      // Get data for level
       const data = this.$refs.levels.getLevel(this.levelNum);
       this.win = false,
-
+      
+      // Load the data for the level
       this.gridSize = data.gridSize;
       this.level = data.level;
       this.originalFuel = data.originalFuel;
@@ -112,7 +130,10 @@ export default {
       this.coinCount = data.coinCount;
     },
 
-    // Check error
+    /**
+     * Check if there is anything wrong with the expression
+     * @param expression 
+     */
     checkError(expression) {
       if(this.tooHigh) {
         this.showError = true;
@@ -149,11 +170,18 @@ export default {
       return false;
     },
 
-    // Check if coin is collected
+    /**
+     * Check if a coin is collected when the player is at x, y
+     * @param x 
+     * @param y 
+     */
     checkPlayerPos(x, y) {
       for (let coin of this.level) {
+
+        // Get distance of player from coin
         const distance = Math.sqrt(Math.pow(coin[0] - x, 2) + Math.pow(coin[1] - y, 2));
 
+        // Collect coin if player is within 0.3 units from the coin
         if (distance <= 0.3 && !coin[2]) {
 
           // Collect if not deadly
@@ -161,14 +189,21 @@ export default {
             coin[2] = true;
             this.coins++;
           }
+          
+          // Kill player if deadly
           else
             this.$refs.player.dead = true;
         }
       }
 
+      // Reduce fuel
       if(this.fuel > 0)
         this.fuel -= 5 * this.animationSpeed;
     },
+
+    /**
+     * Reset level
+     */
     resetLevel() {
       for(let coin of this.level) {
         this.win = false;
@@ -176,22 +211,39 @@ export default {
         coin[2] = false; // Reset collected status
       }
     },
+
+    /**
+     * Launch player with expression
+     * @param expression 
+     */
     launch(expression) {
       if(!this.$refs.player.dead) return; // Do nothing if game is playing
+
+      // Make sure level is loaded and no coins are collected
       this.loadLevel();
       this.coins = 0;
 
-      if(this.checkError(expression)) return;
-      this.fuel = this.originalFuel;
-      this.$refs.player.followTrajectory(expression, this.animationSpeed);
-      this.resetLevel();
+      if(this.checkError(expression)) return; // Do nothing if expression causes errors
+      this.fuel = this.originalFuel; // Reset fuel
+      this.$refs.player.followTrajectory(expression, this.animationSpeed); // Make player follow trajectory
+      this.resetLevel(); // Make sure level is reset
     },
+
+    /**
+     * Update the start position for the player
+     * @param expression 
+     */
     updateStart(expression) {
       this.$refs.player.updateStart(expression);
       this.$refs.player.trail = [];
       this.checkWarnings(expression);
       this.resetLevel();
     },
+
+    /**
+     * Check if expression is too high or too low without giving error message
+     * @param expression 
+     */
     checkWarnings(expression) {
       try {
         var xPos = math.evaluate(expression, {x : 0})

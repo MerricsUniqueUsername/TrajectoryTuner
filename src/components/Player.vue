@@ -42,6 +42,12 @@ export default {
     };
   },
   methods: {
+
+    /**
+     * Start playing the level
+     * @param expression 
+     * @param speed 
+     */
     followTrajectory(expression, speed) {
       if (!this.dead) return; // Don't do anything if game is going
 
@@ -53,6 +59,12 @@ export default {
       this.dead = false;
       requestAnimationFrame(this.animation);
     },
+
+    /**
+     * Update starting position of the player by putting it
+     * at the y intercept. Also remove the trail
+     * @param expression 
+     */
     updateStart(expression) {
       try {
         this.dead = true;
@@ -65,10 +77,15 @@ export default {
         return;
       }
     },
+
+    /**
+     * Run the animation
+     * @param timestamp 
+     */
     animation(timestamp) {
       this.checkDead();
 
-      // Change trajectory if there is fuel
+      // Change trajectory direction if there is fuel
       if(this.fuel > 0)
         var derivative = math.derivative(this.expression, 'x').evaluate({ x: this.x });
 
@@ -77,8 +94,11 @@ export default {
         var derivative = this.derivative
 
       
+      // Get x and y speed of player based on derivitive of the expression
       const ySpd = math.sin(math.atan(derivative));
       const xSpd = math.cos(math.atan(derivative));
+
+      // Move player based on the speed
       this.x += xSpd * this.animationSpeed;
       this.y += ySpd * this.animationSpeed;
       this.derivative = derivative; // Update the derivative for the next frame
@@ -86,11 +106,19 @@ export default {
 
       this.updateTrail(); // Add the current position to the trail
 
+      // Go to next animation frame if the player is still alive
       if (!this.dead) requestAnimationFrame(this.animation);
 
+      // Check if player is colliding with a coin
       this.collectCoins();
     },
+
+    /**
+     * Check if player is dead
+     */
     checkDead() {
+
+      // Get position
       const x = this.x;
       const y = this.y;
 
@@ -100,10 +128,20 @@ export default {
         this.$emit("leave");
       }
     },
+
+    /**
+     * Emit 'updatePos' which will be used to check if colliding with a coin in
+     * the Graph component
+     */
     collectCoins() {
       this.$emit('updatePos', this.x, this.y);
     },
+
+    /**
+     * Update the trail
+     */
     updateTrail() {
+      
       // Add the current position to the trail
       this.trail.push({
         x: (this.x / this.gridSize) * 100 + '%',
