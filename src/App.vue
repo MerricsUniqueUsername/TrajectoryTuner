@@ -1,11 +1,17 @@
 <template>
 
+  <!-- Game -->
   <div class="game">
+
+    <!-- Graph -->
     <Graph ref="graph" />
 
+    <!-- Input -->
     <div class="type">
       <div style="font-size: 24px">f(x) = </div>
       <input autocomplete="off" type="text" @input="updateStart()" v-model="expression">
+
+      <!-- Launch button -->
       <div class="launch" @click="launch()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-rocket" viewBox="0 0 16 16">
           <path d="M8 8c.828 0 1.5-.895 1.5-2S8.828 4 8 4s-1.5.895-1.5 2S7.172 8 8 8"/>

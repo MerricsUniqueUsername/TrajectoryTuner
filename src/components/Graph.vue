@@ -177,11 +177,11 @@ export default {
       }
     },
     launch(expression) {
+      if(!this.$refs.player.dead) return; // Do nothing if game is playing
       this.loadLevel();
       this.coins = 0;
 
       if(this.checkError(expression)) return;
-      if(!this.$refs.player.dead) return; // Do nothing if game is playing
       this.fuel = this.originalFuel;
       this.$refs.player.followTrajectory(expression, this.animationSpeed);
       this.resetLevel();
@@ -305,6 +305,7 @@ export default {
     background-color: rgb(19, 19, 19);
 
     width: 450px;
+    flex-shrink: 0;
     border-radius: 3px;
   }
 
