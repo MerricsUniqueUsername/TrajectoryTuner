@@ -151,7 +151,6 @@ export default {
       });
     },
   },
-  inject: ['gridSize'],
   computed: {
     computedX() {
       return (this.x / this.gridSize * 100) + '%';

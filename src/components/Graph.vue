@@ -17,7 +17,7 @@
           <br> 
           <span v-html="errorMessage.suggestion"></span>
           <br><br>
-          <span v-show="errorMessage.showF0" color: white>f(0) = <span>{{ parseFloat($refs.player.y.toFixed(2)) }}</span></span>
+          <span v-show="errorMessage.showF0" style="color: white">f(0) = <span>{{ $refs.player?.y ? parseFloat($refs.player.y.toFixed(2)) : 0 }}</span></span>
         </p>
 
         <div class="closeButton" style="margin: 20px" @click="showError = false">Close</div>
@@ -58,7 +58,6 @@ import Player from './Player.vue'
 import Coin from './Coin.vue'
 import Levels from './Levels.vue'
 import Dialog from 'primevue/dialog';
-import { provide } from 'vue'
 import * as math from 'mathjs'
 
 export default {
@@ -79,7 +78,7 @@ export default {
 
       // Level data
       coins: 0,
-      levelNum: 0,
+      levelNum: 12,
       gridSize: 12,
       originalFuel: 215,
       fuel: 215,
@@ -135,6 +134,7 @@ export default {
      * @param expression 
      */
     checkError(expression) {
+
       if(this.tooHigh) {
         this.showError = true;
         this.errorMessage.reason = "Y-Intercept too high";
