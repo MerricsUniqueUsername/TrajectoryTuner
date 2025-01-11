@@ -78,7 +78,7 @@ export default {
 
       // Level data
       coins: 0,
-      levelNum: 12,
+      levelNum: 0,
       gridSize: 12,
       originalFuel: 215,
       fuel: 215,

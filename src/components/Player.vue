@@ -9,7 +9,7 @@
       :key="index"
       :style="{ left: pos.x, bottom: pos.y, transform: `rotate(${pos.angle}rad)`, backgroundColor: pos.bg }"
       class="trail"
-    ></div>
+    />
   </div>
 </template>
 

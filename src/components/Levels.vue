@@ -9,7 +9,7 @@ export default {
 
       levels: {
 
-        0: {
+        10000000: {
           gridSize: 24,
           originalFuel: 1000,
           animationSpeed: 0.25,
@@ -19,7 +19,7 @@ export default {
           ]
         },
         
-        100000: {
+        0: {
           gridSize: 6,
           originalFuel: 32,
           animationSpeed: 0.08,

@@ -9,7 +9,8 @@
     <!-- Input -->
     <div class="type">
       <div style="font-size: 24px">f(x) = </div>
-      <input autocomplete="off" type="text" @input="updateStart()" v-model="expression">
+      <MathLive ref="input" @input="updateStart()" />  
+      <!-- <input autocomplete="off" type="text" @input="updateStart()" v-model="expression"> -->
 
       <!-- Launch button -->
       <div class="launch" @click="launch()">
@@ -26,11 +27,13 @@
 
 <script>
 import Graph from './components/Graph.vue'
+import MathLive from './components/MathLive.vue'
 
 export default {
   name: 'App',
   components: {
-    Graph
+    Graph,
+    MathLive,
   },
   data() {
     return {
@@ -41,13 +44,20 @@ export default {
   },
   methods: {
 
+    // Get expression
+    getExpression() {
+      this.expression = this.$refs.input.convertedExpression;
+    },
+
     // Run launch function in grid component, passing in expression
     launch() {
+      this.getExpression();
       this.$refs.graph.launch(this.expression);
     },
 
     // Run update start function in grid component, passing in expression
     updateStart() {
+      this.getExpression();
       this.$refs.graph.updateStart(this.expression);
     }
   }
@@ -124,23 +134,4 @@ export default {
     height: fit-content;
   }
 
-  input {
-    margin: 17px;
-    padding: 10px;
-    font-size: 18px;
-    border: none;
-    width: 200px;
-    outline: none;
-    color: rgba(255, 255, 255, 0.781);
-
-    background-color: transparent;
-    border-bottom: rgba(255, 255, 255, 0.534) 1px solid;
-    transition: 0.3s ease;
-  }
-
-  input:focus {
-    transition: 0.3s ease;
-    color: white;
-    border-bottom: rgba(255, 255, 255, 1)  1px solid;
-  }
 </style>
