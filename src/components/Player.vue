@@ -9,7 +9,7 @@
       :key="index"
       :style="{ left: pos.x, bottom: pos.y, transform: `rotate(${pos.angle}rad)`, backgroundColor: pos.bg }"
       class="trail"
-    />
+    ></div>
   </div>
 </template>
 
@@ -151,6 +151,7 @@ export default {
       });
     },
   },
+  inject: ['gridSize'],
   computed: {
     computedX() {
       return (this.x / this.gridSize * 100) + '%';
