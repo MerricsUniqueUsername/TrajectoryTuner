@@ -17,7 +17,7 @@
           <br> 
           <span v-html="errorMessage.suggestion"></span>
           <br><br>
-          <span v-show="errorMessage.showF0" style="color: white">f(0) = <span>{{ $refs.player?.y ? parseFloat($refs.player.y.toFixed(2)) : 0 }}</span></span>
+          <span v-show="errorMessage.showF0" color: white>f(0) = <span>{{ parseFloat($refs.player.y.toFixed(2)) }}</span></span>
         </p>
 
         <div class="closeButton" style="margin: 20px" @click="showError = false">Close</div>
@@ -58,6 +58,8 @@ import Player from './Player.vue'
 import Coin from './Coin.vue'
 import Levels from './Levels.vue'
 import Dialog from 'primevue/dialog';
+import { provide } from 'vue'
+import { useRouter } from 'vue-router';
 import * as math from 'mathjs'
 
 export default {
@@ -78,7 +80,7 @@ export default {
 
       // Level data
       coins: 0,
-      levelNum: 0,
+      levelNum: -1,
       gridSize: 12,
       originalFuel: 215,
       fuel: 215,
@@ -86,6 +88,7 @@ export default {
       level: [],
       coinCount: 3,
       win: false,
+      router: useRouter(),
     }
   },
   methods: {
@@ -104,9 +107,22 @@ export default {
     /**
      * Load next level
      */
-    nextLevel() {
+    async nextLevel() {
       this.levelNum++;
-      this.loadLevel();
+      await this.loadLevel();
+      this.updateStart();
+      this.resetLevel();
+      console.log("asdfasdf");
+      this.router.replace('/level/' + this.levelNum);
+    },
+
+    /**
+    * Set the level, for use in level URLs
+    * @param levelNum
+    */
+    async setLevel(levelNum) {
+      this.levelNum = levelNum;
+      await this.loadLevel();
       this.updateStart();
       this.resetLevel();
     },
@@ -114,19 +130,23 @@ export default {
     /**
      * Load the current level
      */
-    loadLevel() {
+    async loadLevel() {
 
-      // Get data for level
-      const data = this.$refs.levels.getLevel(this.levelNum);
-      this.win = false,
+      this.win = false;
       
-      // Load the data for the level
-      this.gridSize = data.gridSize;
-      this.level = data.level;
-      this.originalFuel = data.originalFuel;
-      this.fuel = data.originalFuel;
-      this.animationSpeed = data.animationSpeed;
-      this.coinCount = data.coinCount;
+      if(this.levelNum != -1) {
+        // Get data for level
+        const data = await this.$refs.levels.getLevel(this.levelNum);
+
+        // Load the data for the level
+        this.gridSize = data.gridSize;
+        this.level = data.level;
+        this.originalFuel = data.originalFuel;
+        this.fuel = data.originalFuel;
+        this.animationSpeed = data.animationSpeed;
+        this.coinCount = data.coinCount;
+
+      }
     },
 
     /**
@@ -134,7 +154,6 @@ export default {
      * @param expression 
      */
     checkError(expression) {
-
       if(this.tooHigh) {
         this.showError = true;
         this.errorMessage.reason = "Y-Intercept too high";
@@ -216,11 +235,11 @@ export default {
      * Launch player with expression
      * @param expression 
      */
-    launch(expression) {
+    async launch(expression) {
       if(!this.$refs.player.dead) return; // Do nothing if game is playing
 
       // Make sure level is loaded and no coins are collected
-      this.loadLevel();
+      await this.loadLevel();
       this.coins = 0;
 
       if(this.checkError(expression)) return; // Do nothing if expression causes errors
