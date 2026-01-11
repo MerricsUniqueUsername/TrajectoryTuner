@@ -112,6 +112,16 @@ export default {
     },
 
     /**
+     * Load previous level
+     */
+    previousLevel() {
+      this.levelNum--;
+      this.loadLevel();
+      this.updateStart();
+      this.resetLevel();
+    },
+
+    /**
      * Load the current level
      */
     loadLevel() {
@@ -274,6 +284,15 @@ export default {
   },
   mounted() {
     this.loadLevel();
+    // Skip level if cntrl+right arrow is pressed
+    window.addEventListener('keydown', (e) => {
+      if(e.key === 'ArrowRight' && e.ctrlKey) {
+        this.nextLevel();
+      }
+      else if(e.key === 'ArrowLeft' && e.ctrlKey) {
+        this.previousLevel();
+      }
+    });
   }
 }
 </script>
